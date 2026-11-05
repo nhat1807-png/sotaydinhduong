@@ -1,0 +1,1672 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NutriROI - Hệ thống Quản lý Dinh dưỡng & Chi phí Thời gian thực</title>
+  <style>
+:root {
+  --bg: #f5f8f6;
+  --card: #ffffff;
+  --card-subtle: #f0f4f1;
+  --ink: #1b2620;
+  --muted: #64746d;
+  --brand: #1a8754;
+  --brand-light: #e8f5ee;
+  --brand-dark: #12633d;
+  --accent: #2563eb;
+  --accent-light: #eff6ff;
+  --warn: #d97706;
+  --warn-light: #fef3c7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --line: #e2e8e5;
+  --radius: 12px;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1613;
+    --card: #18221d;
+    --card-subtle: #1e2b25;
+    --ink: #eaf1ed;
+    --muted: #95a59c;
+    --brand: #22c55e;
+    --brand-light: #153322;
+    --brand-dark: #16a34a;
+    --accent: #3b82f6;
+    --accent-light: #172554;
+    --warn: #f59e0b;
+    --warn-light: #451a03;
+    --danger: #ef4444;
+    --danger-light: #450a0a;
+    --line: #273830;
+    --shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+header.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #15663f 0%, #1e8253 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-logo {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.brand-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.brand-sub {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  display: block;
+}
+.nav-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.nav-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 10px 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.nav-tabs button {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted);
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+.nav-tabs button:hover {
+  background: var(--card-subtle);
+  color: var(--ink);
+}
+.nav-tabs button.active {
+  background: var(--brand);
+  color: #ffffff;
+  border-color: var(--brand);
+}
+main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.card h2, .card h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+.card-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+.grid-col-full { grid-column: 1 / -1; }
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+input, select, textarea {
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(26, 135, 84, 0.18);
+}
+button {
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--brand);
+  color: #fff;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s ease, transform 0.05s;
+}
+button:hover { background: var(--brand-dark); }
+button:active { transform: scale(0.98); }
+button.secondary { background: var(--card-subtle); color: var(--ink); border: 1px solid var(--line); }
+button.secondary:hover { background: var(--line); }
+button.ghost { background: rgba(255, 255, 255, 0.18); color: #fff; }
+button.ghost:hover { background: rgba(255, 255, 255, 0.3); }
+button.danger { background: var(--danger); }
+button.danger:hover { background: #b91c1c; }
+button.link { background: none; color: var(--danger); padding: 4px 8px; font-size: 0.82rem; }
+button.link:hover { text-decoration: underline; background: var(--danger-light); }
+button.small { padding: 5px 10px; font-size: 0.8rem; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+.stat-box {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card-subtle);
+}
+.stat-box.highlight {
+  background: var(--brand-light);
+  border-color: rgba(26, 135, 84, 0.3);
+}
+.stat-box b {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.stat-box span {
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+}
+.bar {
+  height: 8px;
+  background: var(--line);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 6px 0 2px;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--brand);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+.bar.over i { background: var(--danger); }
+
+.preview-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--card-subtle);
+  border-radius: 8px;
+  border: 1px dashed var(--line);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+th, td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+th {
+  background: var(--card-subtle);
+  font-weight: 600;
+  color: var(--muted);
+}
+.scroll-table {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  background: var(--brand);
+  color: #fff;
+}
+.badge.warn { background: var(--warn); }
+.badge.accent { background: var(--accent); }
+.badge.muted { background: var(--muted); }
+.badge.danger { background: var(--danger); }
+
+.funnel-container {
+  display: grid;
+  gap: 10px;
+}
+.stage-card {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+.stage-card.current {
+  border-color: var(--brand);
+  background: var(--brand-light);
+  box-shadow: 0 0 0 1px var(--brand);
+}
+.stage-card.current b { color: var(--brand-dark); }
+.stage-info { flex: 1; }
+.stage-desc { font-size: 0.82rem; color: var(--muted); margin-top: 3px; }
+
+dialog {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--ink);
+  max-width: 560px;
+  width: 92%;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); }
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.dialog-header h2 { margin: 0; font-size: 1.2rem; }
+
+.quick-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.quick-chip {
+  background: var(--card-subtle);
+  border: 1px solid var(--line);
+  padding: 3px 8px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.quick-chip:hover {
+  background: var(--brand-light);
+  border-color: var(--brand);
+  color: var(--brand-dark);
+}
+
+.notice-banner {
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--warn-light);
+  border-left: 4px solid var(--warn);
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.notice-banner.success {
+  background: var(--brand-light);
+  border-left-color: var(--brand);
+}
+.notice-banner.info {
+  background: var(--accent-light);
+  border-left-color: var(--accent);
+}
+.empty-placeholder {
+  text-align: center;
+  padding: 30px 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.roi-metric {
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--brand-light);
+  border: 1px solid rgba(26, 135, 84, 0.25);
+  margin-top: 14px;
+}
+.roi-metric h4 {
+  margin: 0 0 6px;
+  color: var(--brand-dark);
+  font-size: 0.95rem;
+}
+.roi-metric p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-group">
+      <span class="brand-logo">🥗</span>
+      <div>
+        <h1 class="brand-title">NutriROI</h1>
+        <span class="brand-sub">Quản lý dinh dưỡng & Tối ưu chi phí cho dân văn phòng</span>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button id="btnLoadPersona" class="ghost small" title="Nạp nhanh dữ liệu mẫu của Persona Nguyễn Hoàng Nam">⚡ Nạp dữ liệu mẫu</button>
+      <button id="btnProfile" class="ghost small">👤 Hồ sơ</button>
+    </div>
+  </header>
+
+  <nav class="nav-tabs" id="tabs">
+    <button data-tab="dashboard" class="active">📊 Tổng quan</button>
+    <button data-tab="meals">🍱 Bữa ăn (< 20s)</button>
+    <button data-tab="workouts">🏋️ Luyện tập</button>
+    <button data-tab="foods">📦 Kho thực phẩm</button>
+    <button data-tab="reports">📈 Báo cáo ROI</button>
+    <button data-tab="crm">🎯 Phễu CRM</button>
+  </nav>
+
+  <main>
+    <!-- TAB 1: DASHBOARD -->
+    <section id="tab-dashboard" class="tab-content active"></section>
+
+    <!-- TAB 2: MEALS -->
+    <section id="tab-meals" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Ghi nhận Bữa ăn nhanh</h2>
+            <div class="card-desc">Ghi nhanh bữa ăn trong dưới 20 giây với tính toán tự động Calo, Macro, Vitamin và Chi phí thực tế.</div>
+          </div>
+          <span class="badge">⚡ Real-time</span>
+        </div>
+        <form id="mealForm" class="grid">
+          <label>Bữa ăn
+            <select id="mealType">
+              <option value="Sáng">🌅 Bữa Sáng</option>
+              <option value="Trưa" selected>☀️ Bữa Trưa</option>
+              <option value="Tối">🌙 Bữa Tối</option>
+              <option value="Phụ">☕ Bữa Phụ (Snack)</option>
+            </select>
+          </label>
+          <label>Tìm kiếm thực phẩm
+            <input id="mealSearch" type="search" placeholder="Gõ tìm: ức gà, yến mạch, trứng..." autocomplete="off">
+          </label>
+          <label>Chọn thực phẩm
+            <select id="mealFood" size="1"></select>
+          </label>
+          <label>Số lượng <span id="unitHint" class="muted"></span>
+            <input id="mealQty" type="number" min="0.1" step="0.1" value="1" required>
+            <div class="quick-chips">
+              <span class="quick-chip" onclick="setMealQty(0.5)">0.5x</span>
+              <span class="quick-chip" onclick="setMealQty(1)">1x</span>
+              <span class="quick-chip" onclick="setMealQty(1.5)">1.5x</span>
+              <span class="quick-chip" onclick="setMealQty(2)">2x</span>
+            </div>
+          </label>
+          <label>Chi phí thực tế (VNĐ) <span class="muted">(Để trống = tính theo giá mẫu)</span>
+            <input id="mealCost" type="number" min="0" step="500" placeholder="Tự tính theo giá mẫu">
+          </label>
+          <button type="submit" style="height: 42px;">💾 Lưu bữa ăn</button>
+        </form>
+        <div id="mealPreview" class="preview-box"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Nhật ký bữa ăn hôm nay</h3>
+            <div class="card-desc">Danh sách các món đã nạp trong ngày. Có thể xóa hoặc điều chỉnh.</div>
+          </div>
+          <div id="mealTodayTotal" class="badge">0 kcal</div>
+        </div>
+        <div id="mealToday"></div>
+      </div>
+    </section>
+
+    <!-- TAB 3: WORKOUTS -->
+    <section id="tab-workouts" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Ghi nhận Luyện tập</h2>
+            <div class="card-desc">Ghi nhận bài tập, thời lượng và năng lượng tiêu hao để cân đối Calo ròng.</div>
+          </div>
+        </div>
+        <form id="workoutForm" class="grid">
+          <label>Bài tập
+            <select id="wType"></select>
+          </label>
+          <label>Thời lượng (phút)
+            <input id="wMins" type="number" min="1" max="600" value="45" required>
+            <div class="quick-chips">
+              <span class="quick-chip" onclick="setWorkoutMins(30)">30p</span>
+              <span class="quick-chip" onclick="setWorkoutMins(45)">45p</span>
+              <span class="quick-chip" onclick="setWorkoutMins(60)">60p</span>
+            </div>
+          </label>
+          <label>Calo tiêu hao ước tính (kcal)
+            <input id="wKcal" type="number" min="0" required>
+          </label>
+          <button type="submit" style="height: 42px;">🏃 Lưu buổi tập</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3>Lịch sử luyện tập gần đây</h3>
+          <div id="workoutTodayTotal" class="badge">0 kcal đã đốt</div>
+        </div>
+        <div id="workoutList"></div>
+      </div>
+    </section>
+
+    <!-- TAB 4: FOODS -->
+    <section id="tab-foods" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Thêm thực phẩm tùy chỉnh</h2>
+            <div class="card-desc">Bổ sung món ăn cá nhân vào kho dữ liệu mà không ảnh hưởng tới dữ liệu gốc.</div>
+          </div>
+        </div>
+        <form id="foodForm" class="grid">
+          <label>Tên món / thực phẩm
+            <input name="name" placeholder="VD: Whey Protein Isolate" required>
+          </label>
+          <label>Đơn vị định lượng
+            <input name="unit" placeholder="VD: 1 muỗng (30g) hoặc 100g" value="100g" required>
+          </label>
+          <label>Giá tham chiếu (VNĐ)
+            <input name="price" type="number" min="0" placeholder="25000" required>
+          </label>
+          <label>Calo (kcal)
+            <input name="cal" type="number" step="0.1" placeholder="120" required>
+          </label>
+          <label>Đạm - Protein (g)
+            <input name="protein" type="number" step="0.1" value="0">
+          </label>
+          <label>Carb - Tinh bột (g)
+            <input name="carb" type="number" step="0.1" value="0">
+          </label>
+          <label>Chất béo - Fat (g)
+            <input name="fat" type="number" step="0.1" value="0">
+          </label>
+          <label>Chất xơ - Fiber (g)
+            <input name="fiber" type="number" step="0.1" value="0">
+          </label>
+          <label>Vitamin A (IU)
+            <input name="vitA" type="number" step="0.1" value="0">
+          </label>
+          <label>Vitamin C (mg)
+            <input name="vitC" type="number" step="0.1" value="0">
+          </label>
+          <label>Canxi (mg)
+            <input name="calcium" type="number" step="0.1" value="0">
+          </label>
+          <label>Sắt (mg)
+            <input name="iron" type="number" step="0.1" value="0">
+          </label>
+          <button type="submit" style="height: 42px;">➕ Thêm vào kho</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Kho dữ liệu thực phẩm thời gian thực</h3>
+            <div class="card-desc">Bấm vào giá tiền để cập nhật giá thị trường cá nhân (giá gốc hệ thống được bảo lưu).</div>
+          </div>
+          <input id="foodTableSearch" type="search" placeholder="Lọc danh sách món..." style="max-width: 200px;">
+        </div>
+        <div class="scroll-table">
+          <table id="foodTable"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: REPORTS -->
+    <section id="tab-reports" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2>Công cụ Báo cáo & Phân tích Health ROI</h2>
+            <div class="card-desc">Đo lường hiệu quả dinh dưỡng và chi phí trên 3 khung thời gian (Daily, Monthly, Custom Period).</div>
+          </div>
+        </div>
+        <form id="reportForm" class="grid">
+          <label>Khung thời gian
+            <select id="rType">
+              <option value="DAILY">Hôm nay (Daily Report)</option>
+              <option value="MONTHLY" selected>Tháng này (Monthly Report)</option>
+              <option value="CUSTOM">Tùy chỉnh khoảng ngày (Custom Period)</option>
+            </select>
+          </label>
+          <label>Từ ngày
+            <input id="rFrom" type="date" required>
+          </label>
+          <label>Đến ngày
+            <input id="rTo" type="date" required>
+          </label>
+          <button type="submit" style="height: 42px;">⚡ Kết xuất Báo cáo</button>
+        </form>
+      </div>
+
+      <div id="reportOut"></div>
+    </section>
+
+    <!-- TAB 6: CRM -->
+    <section id="tab-crm" class="tab-content"></section>
+  </main>
+
+  <!-- MODAL: HỒ SƠ THỂ TRẠNG -->
+  <dialog id="profileDialog">
+    <div class="dialog-header">
+      <h2>Thiết lập Hồ sơ Thể trạng & Ngân sách</h2>
+      <button class="secondary small" onclick="document.getElementById('profileDialog').close()">✕</button>
+    </div>
+    <form method="dialog" id="profileForm" class="grid">
+      <label>Họ và tên
+        <input name="name" placeholder="Nguyễn Hoàng Nam" required>
+      </label>
+      <label>Email
+        <input name="email" type="email" placeholder="nam.nguyen@example.com" value="nam.nguyen@example.com">
+      </label>
+      <label>Chiều cao (cm)
+        <input name="height" type="number" min="100" max="230" value="172" required>
+      </label>
+      <label>Cân nặng (kg)
+        <input name="weight" type="number" min="30" max="250" step="0.1" value="68.5" required>
+      </label>
+      <label>Mục tiêu thể chất
+        <select name="goal">
+          <option value="cut">Giảm mỡ / Siết cân (Cutting)</option>
+          <option value="bulk" selected>Tăng cơ nạc (Lean Bulking)</option>
+          <option value="maintain">Duy trì thể trạng & Tỉnh táo</option>
+        </select>
+      </label>
+      <label>Mục tiêu Calo mỗi ngày (kcal)
+        <input name="calTarget" type="number" min="800" max="5000" value="2000" required>
+      </label>
+      <label>Hạn mức ngân sách ăn uống/tháng (VNĐ)
+        <input name="budget" type="number" min="0" step="100000" value="3500000" required>
+      </label>
+      <div class="grid-col-full" style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px;">
+        <button type="button" class="secondary" onclick="document.getElementById('profileDialog').close()">Hủy</button>
+        <button type="submit">Lưu hồ sơ thể trạng</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+  // Dữ liệu hạt giống chuẩn theo PRD NutriROI v1.0.0 (Bảng 5.3)
+  const SEED_FOODS = [
+    { id: 'f1',  name: 'Ức gà tươi phi lê',       unit: '100g',  price: 18000, cal: 165, protein: 31.0, carb: 0.0,  fat: 3.6, fiber: 0.0,  vitA: 40,    vitC: 0.0,  calcium: 15,  iron: 1.0 },
+    { id: 'f2',  name: 'Trứng gà công nghiệp',    unit: '1 quả', price: 3500,  cal: 72,  protein: 6.3,  carb: 0.4,  fat: 4.8, fiber: 0.0,  vitA: 270,   vitC: 0.0,  calcium: 28,  iron: 0.9 },
+    { id: 'f3',  name: 'Yến mạch cán dẹt',        unit: '100g',  price: 15000, cal: 389, protein: 16.9, carb: 66.3, fat: 6.9, fiber: 10.6, vitA: 0,     vitC: 0.0,  calcium: 54,  iron: 4.7 },
+    { id: 'f4',  name: 'Bông cải xanh (Súp lơ)',  unit: '100g',  price: 12000, cal: 34,  protein: 2.8,  carb: 6.6,  fat: 0.4, fiber: 2.6,  vitA: 623,   vitC: 89.2, calcium: 47,  iron: 0.7 },
+    { id: 'f5',  name: 'Khoai lang luộc',         unit: '100g',  price: 5000,  cal: 86,  protein: 1.6,  carb: 20.1, fat: 0.1, fiber: 3.0,  vitA: 14187, vitC: 2.4,  calcium: 30,  iron: 0.6 },
+    { id: 'f6',  name: 'Cá hồi phi lê Nauy',      unit: '100g',  price: 65000, cal: 208, protein: 20.4, carb: 0.0,  fat: 13.4,fiber: 0.0,  vitA: 149,   vitC: 3.9,  calcium: 9,   iron: 0.3 },
+    { id: 'f7',  name: 'Sữa tươi không đường',    unit: '200ml', price: 8500,  cal: 124, protein: 6.4,  carb: 9.6,  fat: 6.6, fiber: 0.0,  vitA: 320,   vitC: 2.0,  calcium: 220, iron: 0.1 },
+    { id: 'f8',  name: 'Cơm trắng nấu chín',      unit: '100g',  price: 3000,  cal: 130, protein: 2.7,  carb: 28.2, fat: 0.3, fiber: 0.4,  vitA: 0,     vitC: 0.0,  calcium: 10,  iron: 0.2 },
+    { id: 'f9',  name: 'Thịt bò nạc phi lê',      unit: '100g',  price: 32000, cal: 250, protein: 26.0, carb: 0.0,  fat: 15.0,fiber: 0.0,  vitA: 0,     vitC: 0.0,  calcium: 18,  iron: 2.6 },
+    { id: 'f10', name: 'Chuối tiêu chín',         unit: '1 quả', price: 3000,  cal: 105, protein: 1.3,  carb: 27.0, fat: 0.4, fiber: 3.1,  vitA: 76,    vitC: 10.3, calcium: 6,   iron: 0.3 },
+    { id: 'f11', name: 'Đậu hũ non / tươi',       unit: '100g',  price: 5000,  cal: 76,  protein: 8.0,  carb: 1.9,  fat: 4.8, fiber: 0.3,  vitA: 85,    vitC: 0.1,  calcium: 350, iron: 5.4 },
+    { id: 'f12', name: 'Cà chua chín',            unit: '100g',  price: 6000,  cal: 18,  protein: 0.9,  carb: 3.9,  fat: 0.2, fiber: 1.2,  vitA: 833,   vitC: 13.7, calcium: 10,  iron: 0.3 },
+    { id: 'f13', name: 'Hạnh nhân sấy',           unit: '30g',   price: 15000, cal: 173, protein: 6.3,  carb: 6.1,  fat: 15.0,fiber: 3.5,  vitA: 0,     vitC: 0.0,  calcium: 76,  iron: 1.1 },
+    { id: 'f14', name: 'Bánh mì nguyên cám',      unit: '1 lát', price: 5000,  cal: 98,  protein: 4.0,  carb: 18.0, fat: 1.2, fiber: 2.5,  vitA: 0,     vitC: 0.0,  calcium: 40,  iron: 1.2 }
+  ];
+
+  // Các bài tập luyện phổ biến & ước tính calo đốt / phút
+  const WORKOUT_TYPES = [
+    { name: 'Gym (Tập tạ / Kháng lực)', kcalPerMin: 6.5 },
+    { name: 'Chạy bộ (Pace 6:30)',        kcalPerMin: 10.5 },
+    { name: 'Đạp xe ngoài trời / Gym',   kcalPerMin: 8.0 },
+    { name: 'Bơi lội tự do',             kcalPerMin: 9.0 },
+    { name: 'HIIT / Cardio đốt mỡ',      kcalPerMin: 11.0 },
+    { name: 'Yoga & Giãn cơ văn phòng',  kcalPerMin: 3.5 },
+    { name: 'Đi bộ nhanh sau giờ làm',   kcalPerMin: 4.5 },
+    { name: 'Cầu lông / Tennis',         kcalPerMin: 7.5 }
+  ];
+
+  // Định nghĩa các giai đoạn phễu CRM theo PRD v1.0.0
+  const CRM_STAGES = [
+    { code: 'LEAD',      name: 'Khách hàng tiềm năng', action: 'Gửi lời mời hoàn thiện hồ sơ dinh dưỡng sau giờ làm (19:30)' },
+    { code: 'ONBOARDED', name: 'Đã thiết lập mục tiêu', action: 'Gợi ý thực đơn đi chợ tiết kiệm tuần đầu tiên' },
+    { code: 'ACTIVE',    name: 'Ghi chép đều đặn',     action: 'Tự động gửi báo cáo tổng kết tuần lúc 21:00 Chủ Nhật' },
+    { code: 'AT_RISK',   name: 'Nguy cơ rời bỏ (>48h)', action: 'Gửi thông báo nhắc nhở nhanh 1-chạm vào khung giờ rảnh (07:00 hoặc 20:00)' },
+    { code: 'CHURNED',   name: 'Rời bỏ (> 14 ngày)',   action: 'Chiến dịch kích hoạt lại: Tặng cẩm nang Meal Prep văn phòng & Báo cáo ROI' }
+  ];
+
+  // Quản lý trạng thái lưu trữ trên trình duyệt (LocalStorage)
+  const Store = (() => {
+    const KEY = 'nutriroi.v1.prod';
+    const def = () => ({
+      profile: null,
+      customFoods: [],
+      priceOverrides: {},
+      meals: [],
+      workouts: [],
+      reports: []
+    });
+
+    let s;
+    try {
+      const raw = localStorage.getItem(KEY);
+      s = raw ? Object.assign(def(), JSON.parse(raw)) : def();
+    } catch (e) {
+      s = def();
+    }
+
+    return {
+      state: s,
+      save() {
+        try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { console.error('Storage error', e); }
+      },
+      uid: () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      foods() {
+        return SEED_FOODS.map(f => ({
+          ...f,
+          price: s.priceOverrides[f.id] != null ? s.priceOverrides[f.id] : f.price
+        })).concat(s.customFoods);
+      },
+      food(id) {
+        return this.foods().find(f => f.id === id);
+      },
+      reset() {
+        localStorage.removeItem(KEY);
+        location.reload();
+      }
+    };
+  })();
+
+  // Bộ điều khiển ứng dụng
+  (function() {
+    const S = Store.state;
+    const $ = (sel, parent = document) => parent.querySelector(sel);
+    const $$ = (sel, parent = document) => [...parent.querySelectorAll(sel)];
+    const esc = str => String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmt = n => Math.round(n || 0).toLocaleString('vi-VN');
+    const vnd = n => fmt(n) + ' đ';
+    const dec = n => (Math.round((n || 0) * 10) / 10).toLocaleString('vi-VN');
+    const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const today = () => ymd(new Date());
+
+    const NUT_KEYS = ['cal', 'protein', 'carb', 'fat', 'fiber', 'vitA', 'vitC', 'calcium', 'iron', 'cost'];
+
+    const calcItemNutrients = (food, qty) => {
+      const res = {};
+      NUT_KEYS.forEach(k => {
+        if (k === 'cost') res[k] = (food.price || 0) * qty;
+        else res[k] = (food[k] || 0) * qty;
+      });
+      return res;
+    };
+
+    const sumList = list => list.reduce((acc, el) => {
+      NUT_KEYS.forEach(k => acc[k] = (acc[k] || 0) + (el[k] || 0));
+      return acc;
+    }, {});
+
+    const inRange = (d, from, to) => d >= from && d <= to;
+    const targetKcal = () => (S.profile && S.profile.calTarget ? S.profile.calTarget : 2000);
+    const monthlyBudget = () => (S.profile && S.profile.budget ? S.profile.budget : 3500000);
+
+    /* --- Chuyển tab --- */
+    $('#tabs').addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn || !btn.dataset.tab) return;
+      $$('#tabs button').forEach(b => b.classList.toggle('active', b === btn));
+      $$('.tab-content').forEach(s => s.classList.toggle('active', s.id === 'tab-' + btn.dataset.tab));
+      render();
+    });
+
+    /* --- Nạp dữ liệu mẫu của Persona Nguyễn Hoàng Nam --- */
+    $('#btnLoadPersona').addEventListener('click', () => {
+      if (confirm('Nạp dữ liệu mẫu của Persona Nguyễn Hoàng Nam (28 tuổi, Data Analyst) gồm hồ sơ, các bữa ăn và buổi tập chuẩn?')) {
+        loadPersonaMockData();
+      }
+    });
+
+    window.setMealQty = q => { $('#mealQty').value = q; updateMealPreview(); };
+    window.setWorkoutMins = m => { $('#wMins').value = m; autoCalcKcal(); };
+
+    function loadPersonaMockData() {
+      const now = new Date();
+      S.profile = {
+        name: 'Nguyễn Hoàng Nam',
+        email: 'nam.nguyen@example.com',
+        height: 172,
+        weight: 68.5,
+        goal: 'bulk',
+        calTarget: 2150,
+        budget: 3500000,
+        createdAt: new Date(now.getTime() - 14 * 864e5).toISOString()
+      };
+
+      // Tạo bữa ăn mẫu cho hôm nay & các ngày trước đó
+      S.meals = [];
+      const d0 = today();
+      const d1 = ymd(new Date(now.getTime() - 1 * 864e5));
+      const d2 = ymd(new Date(now.getTime() - 2 * 864e5));
+
+      const addMeal = (date, hour, mealType, foodId, qty, actualCost = null) => {
+        const f = Store.food(foodId);
+        if (!f) return;
+        const c = calcItemNutrients(f, qty);
+        if (actualCost != null) c.cost = actualCost;
+        S.meals.push({
+          id: Store.uid(),
+          date: date,
+          hour: hour,
+          ts: new Date(`${date}T${String(Math.floor(hour)).padStart(2, '0')}:00:00`).toISOString(),
+          mealType: mealType,
+          foodId: f.id,
+          foodName: f.name,
+          unit: f.unit,
+          qty: qty,
+          ...c
+        });
+      };
+
+      // Hôm nay: Sáng (07:15 - ngoài giờ HC), Trưa (12:00), Tối (19:30 - ngoài giờ HC)
+      addMeal(d0, 7.25, 'Sáng', 'f3', 1.0, 15000); // Yến mạch
+      addMeal(d0, 7.25, 'Sáng', 'f7', 1.0, 8500);  // Sữa tươi
+      addMeal(d0, 7.25, 'Sáng', 'f2', 2.0, 7000);  // 2 trứng gà
+      addMeal(d0, 12.0, 'Trưa', 'f1', 2.0, 36000); // 200g Ức gà
+      addMeal(d0, 12.0, 'Trưa', 'f8', 1.5, 4500);  // 150g Cơm
+      addMeal(d0, 12.0, 'Trưa', 'f4', 1.5, 18000); // 150g Bông cải
+      addMeal(d0, 19.5, 'Tối',  'f6', 1.5, 95000); // 150g Cá hồi
+      addMeal(d0, 19.5, 'Tối',  'f5', 2.0, 10000); // 200g Khoai lang
+      addMeal(d0, 21.0, 'Phụ',  'f10', 1.0, 3000); // 1 quả chuối
+
+      // Hôm qua (d1)
+      addMeal(d1, 7.3,  'Sáng', 'f14', 2.0, 10000);
+      addMeal(d1, 7.3,  'Sáng', 'f2',  2.0, 7000);
+      addMeal(d1, 12.1, 'Trưa', 'f9',  1.5, 48000);
+      addMeal(d1, 12.1, 'Trưa', 'f8',  2.0, 6000);
+      addMeal(d1, 19.8, 'Tối',  'f1',  2.0, 36000);
+      addMeal(d1, 19.8, 'Tối',  'f4',  2.0, 24000);
+
+      // Hôm kia (d2)
+      addMeal(d2, 7.1,  'Sáng', 'f3',  1.2, 18000);
+      addMeal(d2, 12.0, 'Trưa', 'f1',  2.0, 36000);
+      addMeal(d2, 20.0, 'Tối',  'f11', 2.0, 10000);
+
+      // Luyện tập mẫu
+      S.workouts = [
+        { id: Store.uid(), date: d0, type: 'Gym (Tập tạ / Kháng lực)', mins: 50, kcal: 325 },
+        { id: Store.uid(), date: d1, type: 'Chạy bộ (Pace 6:30)', mins: 35, kcal: 368 },
+        { id: Store.uid(), date: d2, type: 'Gym (Tập tạ / Kháng lực)', mins: 60, kcal: 390 }
+      ];
+
+      Store.save();
+      render();
+      alert('Đã nạp thành công dữ liệu mẫu của Persona Nguyễn Hoàng Nam!\nBạn có thể xem Dashboard, Báo cáo ROI hoặc trải nghiệm các chức năng.');
+    }
+
+    /* --- Hồ sơ người dùng --- */
+    const profileDlg = $('#profileDialog');
+    $('#btnProfile').onclick = () => {
+      const f = $('#profileForm');
+      if (S.profile) {
+        Object.entries(S.profile).forEach(([k, v]) => {
+          if (f.elements[k]) f.elements[k].value = v;
+        });
+      }
+      profileDlg.showModal();
+    };
+
+    $('#profileForm').addEventListener('submit', e => {
+      const f = e.target.elements;
+      S.profile = {
+        name: f.name.value,
+        email: f.email.value || 'user@example.com',
+        height: +f.height.value,
+        weight: +f.weight.value,
+        goal: f.goal.value,
+        calTarget: +f.calTarget.value,
+        budget: +f.budget.value,
+        createdAt: S.profile ? S.profile.createdAt : new Date().toISOString()
+      };
+      Store.save();
+      render();
+    });
+
+    /* --- Bữa ăn (Meals) --- */
+    const fSel = $('#mealFood'), fQty = $('#mealQty'), fCost = $('#mealCost'), fSearch = $('#mealSearch');
+
+    function fillFoodSelect() {
+      const q = fSearch.value.trim().toLowerCase();
+      const currentVal = fSel.value;
+      const list = Store.foods().filter(f => f.name.toLowerCase().includes(q));
+      fSel.innerHTML = list.map(f =>
+        `<option value="${f.id}">${esc(f.name)} - ${vnd(f.price)} / ${esc(f.unit)}</option>`
+      ).join('');
+      if (list.some(f => f.id === currentVal)) fSel.value = currentVal;
+      updateMealPreview();
+    }
+
+    function updateMealPreview() {
+      const f = Store.food(fSel.value);
+      if (!f) {
+        $('#mealPreview').innerHTML = '<span class="muted">Chưa chọn thực phẩm hoặc không tìm thấy.</span>';
+        return;
+      }
+      $('#unitHint').textContent = `(1 đơn vị = ${f.unit})`;
+      const qty = +fQty.value || 0;
+      const calculated = calcItemNutrients(f, qty);
+      const costFinal = (fCost.value !== '' && !isNaN(+fCost.value)) ? +fCost.value : calculated.cost;
+
+      $('#mealPreview').innerHTML =
+        `<strong>🔥 ${fmt(calculated.cal)} kcal</strong> &bull; ` +
+        `Đạm: <b>${dec(calculated.protein)}g</b> &bull; ` +
+        `Carb: <b>${dec(calculated.carb)}g</b> &bull; ` +
+        `Béo: <b>${dec(calculated.fat)}g</b> &bull; ` +
+        `Xơ: <b>${dec(calculated.fiber)}g</b> &bull; ` +
+        `Vit A: <b>${fmt(calculated.vitA)} IU</b> &bull; ` +
+        `Vit C: <b>${dec(calculated.vitC)} mg</b> &bull; ` +
+        `Canxi: <b>${dec(calculated.calcium || 0)} mg</b> &bull; ` +
+        `Sắt: <b>${dec(calculated.iron || 0)} mg</b> &bull; ` +
+        `Thành tiền: <strong style="color:var(--brand);">${vnd(costFinal)}</strong>`;
+    }
+
+    fSearch.addEventListener('input', fillFoodSelect);
+    fSel.addEventListener('input', updateMealPreview);
+    fQty.addEventListener('input', updateMealPreview);
+    fCost.addEventListener('input', updateMealPreview);
+
+    $('#mealForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const f = Store.food(fSel.value);
+      const qty = +fQty.value;
+      if (!f || !(qty > 0)) return;
+
+      const c = calcItemNutrients(f, qty);
+      if (fCost.value !== '' && !isNaN(+fCost.value)) {
+        c.cost = +fCost.value; // Gõ đè chi phí thực tế nếu có
+      }
+
+      const now = new Date();
+      const currentHour = now.getHours() + (now.getMinutes() / 60);
+
+      S.meals.push({
+        id: Store.uid(),
+        date: today(),
+        hour: currentHour,
+        ts: now.toISOString(),
+        mealType: $('#mealType').value,
+        foodId: f.id,
+        foodName: f.name,
+        unit: f.unit,
+        qty: qty,
+        ...c
+      });
+
+      fCost.value = '';
+      Store.save();
+      render();
+    });
+
+    function renderMealTable(list) {
+      if (!list.length) {
+        return '<div class="empty-placeholder">Chưa có món ăn nào được ghi nhận hôm nay. Hãy chọn món bên trên để lưu trong &lt; 20s!</div>';
+      }
+      return `
+        <div class="scroll-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Bữa</th>
+                <th>Thực phẩm</th>
+                <th>Số lượng</th>
+                <th>Năng lượng</th>
+                <th>Đạm (P)</th>
+                <th>Carb</th>
+                <th>Béo (F)</th>
+                <th>Chi phí</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${list.map(m => `
+                <tr>
+                  <td><span class="badge ${m.mealType === 'Sáng' ? 'warn' : m.mealType === 'Trưa' ? 'accent' : 'muted'}">${esc(m.mealType)}</span></td>
+                  <td><strong>${esc(m.foodName)}</strong></td>
+                  <td>${dec(m.qty)} &times; ${esc(m.unit)}</td>
+                  <td><b>${fmt(m.cal)} kcal</b></td>
+                  <td>${dec(m.protein)}g</td>
+                  <td>${dec(m.carb)}g</td>
+                  <td>${dec(m.fat)}g</td>
+                  <td style="color:var(--brand);font-weight:600;">${vnd(m.cost)}</td>
+                  <td>
+                    <button class="link" data-del-meal="${m.id}">Xóa</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    /* --- Luyện tập (Workouts) --- */
+    $('#wType').innerHTML = WORKOUT_TYPES.map(w => `<option value="${w.name}">${w.name}</option>`).join('');
+
+    function autoCalcKcal() {
+      const selected = WORKOUT_TYPES.find(w => w.name === $('#wType').value);
+      const mins = +$('#wMins').value || 0;
+      if (selected) {
+        $('#wKcal').value = Math.round(selected.kcalPerMin * mins);
+      }
+    }
+
+    $('#wType').addEventListener('input', autoCalcKcal);
+    $('#wMins').addEventListener('input', autoCalcKcal);
+    autoCalcKcal();
+
+    $('#workoutForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const mins = +$('#wMins').value;
+      const kcal = +$('#wKcal').value;
+      if (!(mins > 0)) return;
+
+      S.workouts.push({
+        id: Store.uid(),
+        date: today(),
+        type: $('#wType').value,
+        mins: mins,
+        kcal: kcal,
+        ts: new Date().toISOString()
+      });
+
+      Store.save();
+      render();
+    });
+
+    /* --- Kho thực phẩm (Food CRUD) --- */
+    $('#foodForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+
+      const newFood = {
+        id: 'c_' + Store.uid(),
+        name: data.name.trim(),
+        unit: data.unit.trim(),
+        custom: true,
+        price: +data.price || 0,
+        cal: +data.cal || 0,
+        protein: +data.protein || 0,
+        carb: +data.carb || 0,
+        fat: +data.fat || 0,
+        fiber: +data.fiber || 0,
+        vitA: +data.vitA || 0,
+        vitC: +data.vitC || 0,
+        calcium: +data.calcium || 0,
+        iron: +data.iron || 0
+      };
+
+      S.customFoods.push(newFood);
+      e.target.reset();
+      Store.save();
+      render();
+      alert(`Đã thêm thành công món "${newFood.name}" vào kho thực phẩm!`);
+    });
+
+    $('#foodTableSearch').addEventListener('input', e => {
+      renderFoodTable(e.target.value.trim().toLowerCase());
+    });
+
+    function renderFoodTable(filterKeyword = '') {
+      const allFoods = Store.foods().filter(f => f.name.toLowerCase().includes(filterKeyword));
+      $('#foodTable').innerHTML = `
+        <thead>
+          <tr>
+            <th>Tên thực phẩm</th>
+            <th>Đơn vị</th>
+            <th>Đơn giá (VNĐ)</th>
+            <th>Calo (kcal)</th>
+            <th>Đạm (g)</th>
+            <th>Carb (g)</th>
+            <th>Béo (g)</th>
+            <th>Xơ (g)</th>
+            <th>Vit A (IU)</th>
+            <th>Vit C (mg)</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${allFoods.map(f => {
+            const isOverridden = S.priceOverrides[f.id] != null;
+            return `
+              <tr>
+                <td>
+                  <strong>${esc(f.name)}</strong>
+                  ${f.custom ? '<span class="badge accent" style="margin-left:4px;">Tự tạo</span>' : ''}
+                </td>
+                <td>${esc(f.unit)}</td>
+                <td>
+                  <span style="font-weight:600; cursor:pointer; color:var(--brand);" data-edit-price="${f.id}" title="Nhấn để đổi giá">
+                    ${vnd(f.price)} ${isOverridden ? '✏️' : ''}
+                  </span>
+                </td>
+                <td>${dec(f.cal)}</td>
+                <td>${dec(f.protein)}</td>
+                <td>${dec(f.carb)}</td>
+                <td>${dec(f.fat)}</td>
+                <td>${dec(f.fiber)}</td>
+                <td>${fmt(f.vitA)}</td>
+                <td>${dec(f.vitC)}</td>
+                <td>
+                  <button class="secondary small" data-edit-price="${f.id}">Sửa giá</button>
+                  ${f.custom ? `<button class="link" data-del-food="${f.id}">Xóa</button>` : ''}
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      `;
+    }
+
+    /* --- Báo cáo (Reports & Health ROI) --- */
+    function computeReportData(type, from, to) {
+      const meals = S.meals.filter(m => inRange(m.date, from, to));
+      const works = S.workouts.filter(w => inRange(w.date, from, to));
+      const totals = sumList(meals);
+
+      const calIn = totals.cal || 0;
+      const expense = totals.cost || 0;
+      const calOut = works.reduce((sum, w) => sum + (w.kcal || 0), 0);
+      const workoutHours = works.reduce((sum, w) => sum + (w.mins || 0), 0) / 60;
+
+      const fromTime = new Date(from).getTime();
+      const toTime = new Date(to).getTime();
+      const days = Math.max(1, Math.round((toTime - fromTime) / 864e5) + 1);
+
+      // Tính số ngày đạt chuẩn mục tiêu calo (±10%)
+      const dailyCalories = {};
+      meals.forEach(m => {
+        dailyCalories[m.date] = (dailyCalories[m.date] || 0) + m.cal;
+      });
+      const target = targetKcal();
+      const onTargetDays = Object.values(dailyCalories).filter(c =>
+        Math.abs(c - target) <= target * 0.1
+      ).length;
+
+      // Chỉ số ROI theo công thức PRD
+      // 1. Chỉ số Chi phí Hiệu quả = Tổng chi phí thực phẩm / Tổng Calo tiêu chuẩn nạp vào
+      const costPerKcal = calIn > 0 ? (expense / calIn) : 0;
+
+      // 2. Tỷ lệ Đầu tư Sức khỏe = (Số giờ luyện tập + Số bữa ăn chuẩn) / Tổng chi tiêu sinh hoạt (chuẩn hóa trên 100k VNĐ)
+      const healthInvestRatio = expense > 0
+        ? ((workoutHours + meals.length) / (expense / 100000))
+        : 0;
+
+      // 3. Health ROI Score (Thang điểm 100)
+      let roiScore = 60;
+      if (calIn > 0) {
+        if (costPerKcal <= 35) roiScore += 15;
+        else if (costPerKcal <= 50) roiScore += 5;
+        else roiScore -= 10;
+      }
+      if (workoutHours >= (days * 0.4)) roiScore += 15;
+      if (onTargetDays >= Math.ceil(days * 0.6)) roiScore += 10;
+      roiScore = Math.min(100, Math.max(20, Math.round(roiScore)));
+
+      return {
+        type, from, to, days,
+        mealCount: meals.length,
+        workoutCount: works.length,
+        calIn, calOut, netCal: calIn - calOut,
+        expense, workoutHours,
+        protein: totals.protein || 0,
+        carb: totals.carb || 0,
+        fat: totals.fat || 0,
+        fiber: totals.fiber || 0,
+        vitA: totals.vitA || 0,
+        vitC: totals.vitC || 0,
+        onTargetDays,
+        costPerKcal,
+        healthInvestRatio,
+        roiScore
+      };
+    }
+
+    function generateMarkdownReport(r) {
+      return `# BÁO CÁO NUTRI-ROI: ${r.type.toUpperCase()}\n` +
+        `**Thời gian đánh giá:** Từ ${r.from} đến ${r.to} (${r.days} ngày)\n` +
+        `**Người dùng:** ${S.profile ? S.profile.name : 'Người dùng NutriROI'}\n\n` +
+        `## 1. TỔNG HỢP NĂNG LƯỢNG & DINH DƯỠNG\n` +
+        `| Chỉ số | Kết quả |\n` +
+        `| :--- | :--- |\n` +
+        `| Số ngày theo dõi | **${r.days} ngày** |\n` +
+        `| Số bữa ăn đã ghi nhận | **${r.mealCount} bữa** |\n` +
+        `| Tổng Calo nạp vào (Calories In) | **${fmt(r.calIn)} kcal** (TB ${fmt(r.calIn / r.days)} kcal/ngày) |\n` +
+        `| Tổng Calo tiêu hao (Burned) | **${fmt(r.calOut)} kcal** |\n` +
+        `| Calo ròng (Net Calories) | **${fmt(r.netCal)} kcal** |\n` +
+        `| Tỷ lệ Macro (Đạm / Carb / Béo) | **${dec(r.protein)}g** / **${dec(r.carb)}g** / **${dec(r.fat)}g** |\n` +
+        `| Chất xơ tổng | **${dec(r.fiber)}g** |\n` +
+        `| Vitamin A / Vitamin C | **${fmt(r.vitA)} IU** / **${dec(r.vitC)} mg** |\n` +
+        `| Số ngày đạt chuẩn mục tiêu calo (±10%) | **${r.onTargetDays} / ${r.days} ngày** |\n\n` +
+        `## 2. TỔNG HỢP CHI PHÍ & ĐẦU TƯ SỨC KHỎE (HEALTH ROI)\n` +
+        `| Chỉ số ROI | Kết quả | Ý nghĩa |\n` +
+        `| :--- | :--- | :--- |\n` +
+        `| Tổng chi phí thực phẩm | **${vnd(r.expense)}** | Chi tiêu ăn uống trong giai đoạn |\n` +
+        `| Tổng thời lượng luyện tập | **${dec(r.workoutHours)} giờ** (${r.workoutCount} buổi) | Cam kết thể chất |\n` +
+        `| **Chỉ số Chi phí Hiệu quả** | **${dec(r.costPerKcal)} đ / kcal** | Chi phí để nạp 1 kcal chất lượng |\n` +
+        `| **Tỷ lệ Đầu tư Sức khỏe** | **${dec(r.healthInvestRatio)}** | (Giờ tập + Bữa chuẩn) / 100.000đ |\n` +
+        `| **Điểm Health ROI Score** | **${r.roiScore} / 100** | Hiệu suất tổng hợp Thể lực & Chi phí |\n\n` +
+        `*Báo cáo được kết xuất tự động bởi NutriROI Tracker v1.0.0*\n`;
+    }
+
+    const downloadFile = (fileName, content, mimeType) => {
+      const blob = new Blob(['\ufeff' + content], { type: mimeType });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    };
+
+    $('#rType').addEventListener('change', () => {
+      const t = $('#rType').value;
+      const d = new Date();
+      if (t === 'DAILY') {
+        $('#rFrom').value = $('#rTo').value = ymd(d);
+      } else if (t === 'MONTHLY') {
+        $('#rFrom').value = ymd(new Date(d.getFullYear(), d.getMonth(), 1));
+        $('#rTo').value = ymd(d);
+      }
+    });
+    $('#rType').dispatchEvent(new Event('change'));
+
+    let currentReport = null;
+
+    $('#reportForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const from = $('#rFrom').value;
+      const to = $('#rTo').value;
+      if (!from || !to || from > to) {
+        alert('Vui lòng chọn khoảng thời gian hợp lệ (Từ ngày <= Đến ngày).');
+        return;
+      }
+
+      currentReport = computeReportData($('#rType').value, from, to);
+      S.reports.push({
+        id: Store.uid(),
+        generatedAt: new Date().toISOString(),
+        ...currentReport
+      });
+      Store.save();
+
+      const r = currentReport;
+      $('#reportOut').innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Kết quả Báo cáo (${r.from} &rarr; ${r.to})</h3>
+              <div class="card-desc">Thời gian tạo: ${new Date().toLocaleTimeString('vi-VN')} &bull; Điểm Health ROI: <strong style="color:var(--brand);">${r.roiScore}/100</strong></div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button id="btnExportMd" class="small">📄 Tải Markdown (.md)</button>
+              <button id="btnExportCsv" class="small secondary">📊 Tải Excel (.csv)</button>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-box highlight">
+              <b>${fmt(r.calIn)} kcal</b>
+              <span>Calo nạp vào (TB ${fmt(r.calIn / r.days)}/ngày)</span>
+            </div>
+            <div class="stat-box">
+              <b>${fmt(r.calOut)} kcal</b>
+              <span>Calo tiêu hao qua tập luyện</span>
+            </div>
+            <div class="stat-box">
+              <b>${fmt(r.netCal)} kcal</b>
+              <span>Calo ròng (In - Burned)</span>
+            </div>
+            <div class="stat-box highlight">
+              <b style="color:var(--brand);">${vnd(r.expense)}</b>
+              <span>Tổng chi phí thực phẩm</span>
+            </div>
+            <div class="stat-box">
+              <b>${dec(r.costPerKcal)} đ</b>
+              <span>Chi phí / 1 kcal</span>
+            </div>
+            <div class="stat-box">
+              <b>${dec(r.workoutHours)} giờ</b>
+              <span>Thời gian luyện tập</span>
+            </div>
+          </div>
+
+          <div class="roi-metric">
+            <h4>💡 Phân tích Health ROI (Hiệu quả / Chi phí):</h4>
+            <p>&bull; <strong>Chỉ số Chi phí Hiệu quả:</strong> <code>${dec(r.costPerKcal)} VNĐ / kcal</code>. (Chuẩn văn phòng khuyến nghị: 25 - 45 đ/kcal tùy tỷ lệ đạm sạch).</p>
+            <p>&bull; <strong>Tỷ lệ Đầu tư Sức khỏe:</strong> <code>${dec(r.healthInvestRatio)} điểm</code> (quy đổi trên mỗi 100.000 VNĐ chi phí).</p>
+            <p>&bull; <strong>Tỷ lệ hoàn thành mục tiêu calo:</strong> Đạt chuẩn <strong>${r.onTargetDays} / ${r.days} ngày</strong> (${Math.round((r.onTargetDays / r.days) * 100)}%).</p>
+          </div>
+
+          <details style="margin-top:14px;cursor:pointer;">
+            <summary style="font-size:0.85rem;color:var(--muted);font-weight:600;">Xem chi tiết nội dung Markdown</summary>
+            <pre style="white-space:pre-wrap;background:var(--card-subtle);padding:12px;border-radius:8px;font-size:0.82rem;margin-top:8px;">${esc(generateMarkdownReport(r))}</pre>
+          </details>
+        </div>
+      `;
+
+      $('#btnExportMd').onclick = () => {
+        downloadFile(`NutriROI-BaoCao-${from}_${to}.md`, generateMarkdownReport(r), 'text/markdown;charset=utf-8');
+      };
+
+      $('#btnExportCsv').onclick = () => {
+        const header = ['Ngày', 'Bữa ăn', 'Thực phẩm', 'Số lượng', 'Đơn vị', 'Calo (kcal)', 'Đạm (g)', 'Carb (g)', 'Béo (g)', 'Chi phí (VND)'];
+        const rows = S.meals
+          .filter(m => inRange(m.date, from, to))
+          .map(m => [
+            m.date,
+            m.mealType,
+            m.foodName,
+            m.qty,
+            m.unit,
+            Math.round(m.cal),
+            dec(m.protein),
+            dec(m.carb),
+            dec(m.fat),
+            Math.round(m.cost)
+          ]);
+        const csvContent = [header, ...rows]
+          .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+          .join('\r\n');
+        downloadFile(`NutriROI-BaoCao-${from}_${to}.csv`, csvContent, 'text/csv;charset=utf-8');
+      };
+    });
+
+    /* --- Phễu CRM & Giờ giấc (Funnel & Off-hours) --- */
+    function detectFunnelStage() {
+      if (!S.profile) return 'LEAD';
+      if (!S.meals.length) return 'ONBOARDED';
+
+      const lastMeal = S.meals[S.meals.length - 1];
+      const lastMealDate = new Date(lastMeal.ts || `${lastMeal.date}T12:00:00`);
+      const diffHours = (Date.now() - lastMealDate.getTime()) / (3600 * 1000);
+
+      if (diffHours > 14 * 24) return 'CHURNED';
+      if (diffHours > 48) return 'AT_RISK';
+      return 'ACTIVE';
+    }
+
+    function renderCrmView() {
+      const currentStage = detectFunnelStage();
+      const allLogs = S.meals.filter(m => m.hour != null);
+      const offHoursCount = allLogs.filter(m => m.hour < 8.5 || m.hour >= 18).length;
+      const offHoursRate = allLogs.length ? Math.round((offHoursCount / allLogs.length) * 100) : 0;
+
+      let touchpointMsg = '';
+      if (currentStage === 'LEAD') {
+        touchpointMsg = 'Nhắc nhở nhẹ lúc 19:30: "Chào bạn, hãy dành 1 phút thiết lập mục tiêu calo để tối ưu ngân sách nhé!"';
+      } else if (currentStage === 'ONBOARDED') {
+        touchpointMsg = 'Gợi ý lúc 20:00: "Thực đơn tuần này: ức gà & yến mạch tiết kiệm 20% chi phí chợ!"';
+      } else if (currentStage === 'AT_RISK') {
+        touchpointMsg = '⚠️ Cảnh báo tự động kích hoạt: Bạn chưa ghi chép hơn 48h. Nhấn 1-chạm để ghi bữa tối nay!';
+      } else if (currentStage === 'ACTIVE') {
+        touchpointMsg = 'Tuyệt vời! Báo cáo tổng kết tuần sẽ gửi tự động vào 21:00 Chủ Nhật.';
+      } else {
+        touchpointMsg = 'Chiến dịch tái kích hoạt: Tặng kế hoạch bữa ăn văn phòng 7 ngày miễn phí.';
+      }
+
+      $('#tab-crm').innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Quản lý Phễu Khách hàng (CRM Funnel)</h2>
+              <div class="card-desc">Tự động phân tầng người dùng theo mức độ tương tác và kích hoạt điểm chạm ngoài giờ hành chính.</div>
+            </div>
+            <span class="badge ${currentStage === 'ACTIVE' ? '' : currentStage === 'AT_RISK' ? 'danger' : 'warn'}">Trạng thái: ${currentStage}</span>
+          </div>
+
+          <div class="notice-banner ${currentStage === 'AT_RISK' ? '' : 'info'}">
+            <div>
+              <strong>Điểm chạm thông minh (Automated Touchpoint):</strong><br>
+              ${touchpointMsg}
+            </div>
+            <button class="secondary small" onclick="alert('Đã gửi thông báo mô phỏng thành công!')">Gửi thử nghiệm</button>
+          </div>
+
+          <div class="funnel-container">
+            ${CRM_STAGES.map(s => {
+              const isCur = s.code === currentStage;
+              return `
+                <div class="stage-card ${isCur ? 'current' : ''}">
+                  <div class="stage-info">
+                    <b>${esc(s.name)} <span class="muted">(${s.code})</span></b>
+                    <div class="stage-desc">${esc(s.action)}</div>
+                  </div>
+                  ${isCur ? '<span class="badge">Đang ở giai đoạn này</span>' : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Phân tích Hành vi Ngoài giờ Hành chính (Time-of-Day)</h3>
+              <div class="card-desc">Mục tiêu PRD: &gt; 80% lượt tương tác diễn ra trước 08:30 hoặc sau 18:00 để không ảnh hưởng công việc.</div>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box highlight">
+              <b style="color: ${offHoursRate >= 80 ? 'var(--brand)' : 'var(--warn)'}">${offHoursRate}%</b>
+              <span>Tỷ lệ ghi chép ngoài giờ HC (${offHoursCount} / ${allLogs.length} lượt)</span>
+            </div>
+            <div class="stat-box">
+              <b>06:00 - 08:30</b>
+              <span>Khung giờ sáng: Đi chợ & Bữa sáng</span>
+            </div>
+            <div class="stat-box">
+              <b>18:30 - 22:30</b>
+              <span>Khung giờ tối: Tập gym & Bữa tối</span>
+            </div>
+          </div>
+          <p class="muted" style="font-size:0.85rem;margin-top:12px;">
+            Hệ thống không gửi thông báo hay đòi hỏi nhập liệu trong khung giờ 08:30 - 17:59, tôn trọng tối đa sự tập trung của nhân viên văn phòng.
+          </p>
+          <div style="border-top:1px solid var(--line);padding-top:14px;margin-top:14px;">
+            <button id="btnResetAllData" class="link">🗑️ Đặt lại (Xóa toàn bộ dữ liệu ứng dụng)</button>
+          </div>
+        </div>
+      `;
+
+      $('#btnResetAllData').onclick = () => {
+        if (confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu và khởi động lại ứng dụng?')) {
+          Store.reset();
+        }
+      };
+    }
+
+    /* --- Dashboard tổng quan --- */
+    function renderDashboard() {
+      const todayMeals = S.meals.filter(m => m.date === today());
+      const todayWorks = S.workouts.filter(w => w.date === today());
+
+      const todayTotals = sumList(todayMeals);
+      const todayCalIn = todayTotals.cal || 0;
+      const todayCalBurned = todayWorks.reduce((sum, w) => sum + (w.kcal || 0), 0);
+      const todayNetCal = todayCalIn - todayCalBurned;
+      const todayCost = todayTotals.cost || 0;
+
+      const target = targetKcal();
+      const pctTarget = Math.min(100, Math.round((todayCalIn / target) * 100));
+
+      // Chi tiêu trong tháng này
+      const now = new Date();
+      const monthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const monthMeals = S.meals.filter(m => m.date && m.date.startsWith(monthPrefix));
+      const monthSpent = monthMeals.reduce((sum, m) => sum + (m.cost || 0), 0);
+      const budget = monthlyBudget();
+      const pctBudget = budget > 0 ? Math.min(100, Math.round((monthSpent / budget) * 100)) : 0;
+
+      // Chi phí trên mỗi kcal hôm nay
+      const costPerKcalToday = todayCalIn > 0 ? (todayCost / todayCalIn) : 0;
+
+      $('#tab-dashboard').innerHTML = `
+        ${!S.profile ? `
+          <div class="notice-banner">
+            <div>
+              <strong>Chào bạn mới!</strong> Bạn chưa thiết lập hồ sơ mục tiêu thể chất và ngân sách.
+            </div>
+            <button id="btnInitProfile" class="small">Thiết lập ngay</button>
+          </div>
+        ` : ''}
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Tổng quan Hôm nay (${new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric' })})</h2>
+              <div class="card-desc">
+                ${S.profile ? `Người dùng: <strong>${esc(S.profile.name)}</strong> &bull; Mục tiêu: <strong>${S.profile.goal === 'cut' ? 'Giảm mỡ' : S.profile.goal === 'bulk' ? 'Tăng cơ' : 'Duy trì'}</strong> (${target} kcal/ngày)` : 'Chưa thiết lập hồ sơ'}
+              </div>
+            </div>
+            <span class="badge ${pctTarget > 110 ? 'danger' : 'accent'}">${pctTarget}% calo mục tiêu</span>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-box highlight">
+              <b>${fmt(todayCalIn)} / ${fmt(target)}</b>
+              <span>kcal Nạp vào (Calories In)</span>
+              <div class="bar ${todayCalIn > target * 1.1 ? 'over' : ''}"><i style="width:${pctTarget}%"></i></div>
+            </div>
+            <div class="stat-box">
+              <b>${fmt(todayCalBurned)} kcal</b>
+              <span>Calo Tiêu hao qua tập luyện</span>
+            </div>
+            <div class="stat-box">
+              <b style="color: ${todayNetCal > target ? 'var(--warn)' : 'var(--brand)'};">${fmt(todayNetCal)} kcal</b>
+              <span>Calo Ròng (Net = In - Burned)</span>
+            </div>
+            <div class="stat-box highlight">
+              <b style="color:var(--brand);">${vnd(todayCost)}</b>
+              <span>Chi tiêu thực phẩm hôm nay</span>
+            </div>
+            <div class="stat-box">
+              <b>${vnd(monthSpent)} / ${vnd(budget)}</b>
+              <span>Ngân sách tháng (${pctBudget}%)</span>
+              <div class="bar ${monthSpent > budget ? 'over' : ''}"><i style="width:${pctBudget}%"></i></div>
+            </div>
+            <div class="stat-box">
+              <b>${dec(costPerKcalToday)} đ</b>
+              <span>Chi phí / 1 kcal hôm nay</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Phân bổ Dinh dưỡng & Vi chất Thiết yếu Hôm nay</h3>
+              <div class="card-desc">Tự động cộng dồn từ các bữa ăn theo thời gian thực</div>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <b>${dec(todayTotals.protein || 0)}g</b>
+              <span>Đạm (Protein)</span>
+            </div>
+            <div class="stat-box">
+              <b>${dec(todayTotals.carb || 0)}g</b>
+              <span>Tinh bột (Carb)</span>
+            </div>
+            <div class="stat-box">
+              <b>${dec(todayTotals.fat || 0)}g</b>
+              <span>Chất béo (Fat)</span>
+            </div>
+            <div class="stat-box">
+              <b>${dec(todayTotals.fiber || 0)}g</b>
+              <span>Chất xơ (Fiber)</span>
+            </div>
+            <div class="stat-box">
+              <b>${fmt(todayTotals.vitA || 0)} IU</b>
+              <span>Vitamin A</span>
+            </div>
+            <div class="stat-box">
+              <b>${dec(todayTotals.vitC || 0)} mg</b>
+              <span>Vitamin C</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const btnInit = $('#btnInitProfile');
+      if (btnInit) btnInit.onclick = () => $('#btnProfile').click();
+    }
+
+    /* --- Lắng nghe sự kiện click dùng chung (Delegation) --- */
+    document.addEventListener('click', e => {
+      const t = e.target.dataset;
+
+      // Xóa bữa ăn
+      if (t.delMeal) {
+        if (confirm('Bạn muốn xóa món ăn này khỏi nhật ký?')) {
+          S.meals = S.meals.filter(m => m.id !== t.delMeal);
+          Store.save();
+          render();
+        }
+      }
+      // Xóa buổi tập
+      else if (t.delWorkout) {
+        if (confirm('Bạn muốn xóa buổi tập này?')) {
+          S.workouts = S.workouts.filter(w => w.id !== t.delWorkout);
+          Store.save();
+          render();
+        }
+      }
+      // Xóa thực phẩm tự tạo
+      else if (t.delFood) {
+        if (confirm('Bạn muốn xóa món ăn tùy chỉnh này khỏi kho?')) {
+          S.customFoods = S.customFoods.filter(f => f.id !== t.delFood);
+          Store.save();
+          render();
+        }
+      }
+      // Sửa giá thực phẩm
+      else if (t.editPrice) {
+        const food = Store.food(t.editPrice);
+        if (!food) return;
+        const newPriceStr = prompt(`Cập nhật đơn giá thị trường cho "${food.name}" (VNĐ / ${food.unit}):`, food.price);
+        if (newPriceStr !== null && !isNaN(+newPriceStr) && +newPriceStr >= 0) {
+          if (food.custom) {
+            food.price = +newPriceStr;
+          } else {
+            S.priceOverrides[food.id] = +newPriceStr;
+          }
+          Store.save();
+          render();
+        }
+      }
+    });
+
+    /* --- Hàm render toàn bộ ứng dụng --- */
+    function render() {
+      renderDashboard();
+      fillFoodSelect();
+
+      const todayMeals = S.meals.filter(m => m.date === today());
+      $('#mealToday').innerHTML = renderMealTable(todayMeals);
+      const todayTotalKcal = todayMeals.reduce((sum, m) => sum + (m.cal || 0), 0);
+      $('#mealTodayTotal').textContent = `${fmt(todayTotalKcal)} kcal nạp`;
+
+      const recentWorkouts = S.workouts.slice(-15).reverse();
+      if (!recentWorkouts.length) {
+        $('#workoutList').innerHTML = '<div class="empty-placeholder">Chưa có dữ liệu luyện tập. Ghi nhận bài tập bên trên để trừ calo!</div>';
+        $('#workoutTodayTotal').textContent = '0 kcal đã đốt';
+      } else {
+        const todayBurned = S.workouts.filter(w => w.date === today()).reduce((sum, w) => sum + w.kcal, 0);
+        $('#workoutTodayTotal').textContent = `${fmt(todayBurned)} kcal hôm nay`;
+        $('#workoutList').innerHTML = `
+          <div class="scroll-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ngày</th>
+                  <th>Bài tập</th>
+                  <th>Thời lượng</th>
+                  <th>Calo tiêu hao</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${recentWorkouts.map(w => `
+                  <tr>
+                    <td>${w.date}</td>
+                    <td><strong>${esc(w.type)}</strong></td>
+                    <td>${w.mins} phút</td>
+                    <td style="color:var(--danger);font-weight:600;">-${w.kcal} kcal</td>
+                    <td><button class="link" data-del-workout="${w.id}">Xóa</button></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      renderFoodTable();
+      renderCrmView();
+    }
+
+    // Khởi chạy lần đầu
+    render();
+    if (!S.profile) {
+      setTimeout(() => profileDlg.showModal(), 300);
+    }
+  })();
+  </script>
+</body>
+</html>
